@@ -9,3 +9,11 @@ export type Contacts = {
     email: string;
     displayName: string;
 }
+
+
+export type Messages = {
+    emisor: string;
+    mensaje: string;
+    fecha: string;
+}
+

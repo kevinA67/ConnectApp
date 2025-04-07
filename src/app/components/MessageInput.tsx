@@ -1,21 +1,65 @@
-import React, { useState, lazy, Suspense } from 'react';
-import { Theme } from 'emoji-picker-react';
+import React, {
+  useState,
+  lazy,
+  Suspense,
+  Dispatch,
+  SetStateAction,
+} from "react";
+import { Theme } from "emoji-picker-react";
+import socket from "../utils/socket";
+import { Contacts, Messages } from "../types";
 
-const EmojiPicker = lazy(() => import('emoji-picker-react'));
+const EmojiPicker = lazy(() => import("emoji-picker-react"));
 
-const MessageInput = () => {
-  const [message, setMessage] = useState('');
+type MessageInputProps = {
+  contact: Contacts | null;
+  user: string;
+  setMessages: Dispatch<SetStateAction<Messages[]>>;
+  messages: Messages[]
+};
+
+const MessageInput = ({ contact, user, setMessages, messages }: MessageInputProps) => {
+  const [message, setMessage] = useState("");
   const [showEmojiPicker, setShowEmojiPicker] = useState(false);
 
   const handleEmojiClick = (emojiData: any) => {
-    setMessage(prev => prev + emojiData.emoji);
+    setMessage((prev) => prev + emojiData.emoji);
     setShowEmojiPicker(false); // cerrar después de elegir
   };
 
   const handleSend = () => {
-    if (message.trim() !== '') {
-      console.log('Mensaje enviado:', message);
-      setMessage('');
+    if (message.trim() !== "") {
+      console.log("Mensaje enviado:", message, " ", contact?.email);
+      socket.emit("message", {
+        clave1 : `${contact?.email}-${user}`,
+        clave2 : `${user}-${contact?.email}`,
+        emisor: user,
+        email: contact?.email,
+        message: message,
+      });
+      setMessage("");
+      if(messages){
+        console.log("Mensajesssss", messages)
+        setMessages((prevMessages) => [
+          ...prevMessages,
+          {
+            emisor: user,
+            mensaje: message,
+            fecha: ""
+          }
+        ]);
+      }
+      else {
+        console.log("Mensajesssss else", messages)
+        setMessages([
+          {
+            emisor: user,
+            mensaje: message,
+            fecha: ""
+          }
+        ]);
+      }
+      
     }
   };
 
@@ -37,7 +81,7 @@ const MessageInput = () => {
         />
         <button
           onClick={handleSend}
-          className="bg-blue-500 text-white p-3 rounded-r-lg"
+          className="bg-blue-500 text-white p-3 rounded-r-lg cursor-pointer"
         >
           Enviar
         </button>
@@ -45,7 +89,9 @@ const MessageInput = () => {
 
       {showEmojiPicker && (
         <div className="absolute bottom-16 left-4 z-10">
-          <Suspense fallback={<div className="text-white">Cargando emojis...</div>}>
+          <Suspense
+            fallback={<div className="text-white">Cargando emojis...</div>}
+          >
             <EmojiPicker onEmojiClick={handleEmojiClick} />
           </Suspense>
         </div>

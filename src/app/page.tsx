@@ -7,7 +7,7 @@ import MessageInput from "./components/MessageInput";
 import { useSearchParams } from "next/navigation";
 import socket from "./utils/socket";
 import { useEffect, useState } from "react";
-import { Contacts } from "./types";
+import { Contacts, Messages } from "./types";
 import Image from "next/image";
 import { useRouter } from "next/navigation";
 import Spinner from "./components/Spinner";
@@ -25,15 +25,13 @@ const Home = () => {
   });
   const [contacts, setContacts] = useState<Contacts[]>([]);
   const [contactSelected, setContactSelected] = useState<Contacts | null>(null);
-  const [message, setMessage] = useState<string>("");
-  const [messages, setMessages] = useState<any[]>([]);
+  const [messages, setMessages] = useState<Messages[]>([]);
   const [loading, setLoading] = useState<boolean>(true); // Estado de carga
 
   useEffect(() => {
     socket.emit("verify_token", {
       token: sessionStorage.getItem("token"),
     });
-    socket.emit("obtener_usuarios");
 
     // Obtener los usuarios solo si el token es válido
     socket.on("obtener_usuarios_response", (data) => {
@@ -47,6 +45,7 @@ const Home = () => {
     // Respuesta de verificación de token
     socket.on("verify_response", (data) => {
       if (data.status === "success") {
+        socket.emit("obtener_usuarios", data.user.uid);
         setUser(data.user);
         setLoading(false); // Validación exitosa, ya podemos mostrar la info
       } else if (data.status === "error") {
@@ -55,10 +54,24 @@ const Home = () => {
       }
     });
 
+    socket.on("message_response", (data) => {
+      console.log("Mensaje respuesta", data)
+      if (data !== null) {
+        console.log("Mensaje respuesta", data)
+        setMessages((prevMessages) => [...prevMessages, data]);
+      }
+    });
+
+    socket.on("obtener_mensajes_respuesta", (data) => {
+      setMessages(data.mensajes);
+    });
+
     // Cleanup de eventos
     return () => {
       socket.off("verify_response");
+      socket.off("message_response")
       socket.off("obtener_usuarios_response");
+      socket.off("obtener_mensajes_respuesta");
     };
   }, [router]);
 
@@ -78,6 +91,7 @@ const Home = () => {
         name={user.displayName ?? ""}
         contacts={contacts}
         setContactSelected={setContactSelected}
+        user={user.email}
       />
       <div className="flex flex-col w-2/3 bg-gray-800">
         {contactSelected !== null ? (
@@ -86,10 +100,10 @@ const Home = () => {
             <ChatHeader contact={contactSelected} />
             {/* Mensajes (ocupa el espacio disponible) */}
             <div className="flex-1 overflow-auto">
-              <MessageList />
+              <MessageList messages= {messages} user={user.email}/>
             </div>
             {/* Envío de mensajes (fijo abajo) */}
-            <MessageInput />
+            <MessageInput contact={contactSelected} user={user.email} setMessages={setMessages} messages={messages}/>
           </>
         ) : (
           <div className="flex justify-center items-center flex-1 flex-col">

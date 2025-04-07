@@ -1,6 +1,6 @@
 "use client";
 
-import React, { ChangeEvent, use, useEffect, useState } from "react";
+import React, { ChangeEvent, use, useEffect, useRef, useState } from "react";
 import Image from "next/image";
 import socket from "../utils/socket";
 import { User } from "../types";
@@ -11,6 +11,7 @@ const page = () => {
   const [user, setUser] = useState<User>({email: "", name: "", password: ""});
   const [isRegistering, setIsRegistering] = useState(false);
   const [error, setError] = useState('');
+  const [active, setActive] = useState(false);
   const router = useRouter();
 
 useEffect(() => {
@@ -18,8 +19,10 @@ useEffect(() => {
     if(data.status === "success") {
       router.push(`/?uid=${data.uid}&name=${data.name}`);
       sessionStorage.setItem('token', data.id_token);
+      setActive(false);
     }else if(data.status === "error") {
       setError(data.message);
+      setActive(false);
     }
   });
 
@@ -27,8 +30,10 @@ useEffect(() => {
     if(data.status === "success") {
       router.push(`/?uid=${data.uid}&name=${data.name}`);
       sessionStorage.setItem('token', data.id_token);
+      setActive(false);
     }else if(data.status === "error") {
       setError(data.message);
+      setActive(false);
     }
   });
   return () => {
@@ -37,31 +42,36 @@ useEffect(() => {
   };
 }, []);
   const handleSubmit = () => {
+    setActive(true);
     const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
 
     if (isRegistering) {
       if(!user.email || !user.name || !user.password) {
         setError("Por favor, completa todos los campos.");
+        setActive(false)
         return;
       }
       if (!emailRegex.test(user.email)) {
         setError("El correo electrónico no es válido.");
+        setActive(false)
         return;
       }
       if (user.password.length < 8) {
         setError("La contraseña debe tener al menos 8 caracteres.");
+        setActive(false)
         return;
       }
 
       socket.emit("register",user);
-
     } else {
       if(!user.email || !user.password) {
         setError("Por favor, completa todos los campos.");
+        setActive(false)
         return;
       }
       if (!emailRegex.test(user.email)) {
         setError("El correo electrónico no es válido.");
+        setActive(false)
         return;
       }
 
@@ -124,6 +134,7 @@ useEffect(() => {
           <button
             className="w-full bg-blue-500 text-white py-2 rounded-lg hover:bg-blue-600 transition"
             onClick={handleSubmit}
+            disabled={active}
           >
             {isRegistering ? "Registrarse" : "Iniciar sesión"}
           </button>

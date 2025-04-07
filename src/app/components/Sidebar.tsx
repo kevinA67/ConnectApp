@@ -8,9 +8,15 @@ type SidebarProps = {
   name: String;
   contacts: Contacts[];
   setContactSelected: (contact: Contacts) => void;
+  user: string;
 };
 
-const Sidebar = ({ name, contacts, setContactSelected }: SidebarProps) => {
+const Sidebar = ({
+  name,
+  contacts,
+  setContactSelected,
+  user,
+}: SidebarProps) => {
   const [isMenuOpen, setIsMenuOpen] = useState(false);
   const toggleMenu = () => {
     setIsMenuOpen(!isMenuOpen);
@@ -19,7 +25,10 @@ const Sidebar = ({ name, contacts, setContactSelected }: SidebarProps) => {
   const handleContactClick = (contact: Contacts) => {
     console.log("Contacto seleccionado:", contact);
     setContactSelected(contact);
-    socket.emit("contact_selected", contact.uid); // Emitir el evento al servidor con el uid del contacto seleccionado
+    socket.emit("obtener_mensajes", {
+      clave1: `${contact.email}-${user}`,
+      clave2: `${user}-${contact.email}`
+    });
   };
 
   return (
@@ -48,7 +57,11 @@ const Sidebar = ({ name, contacts, setContactSelected }: SidebarProps) => {
 
       <div className="space-y-3">
         {contacts.map((contact) => (
-          <div key={contact.uid} className="flex items-center space-x-3 p-2 rounded hover:bg-gray-700 cursor-pointer border-t-1 border-b-1" onClick={() => handleContactClick(contact)}>
+          <div
+            key={contact.uid}
+            className="flex items-center space-x-3 p-2 rounded hover:bg-gray-700 cursor-pointer border-t-1 border-b-1"
+            onClick={() => handleContactClick(contact)}
+          >
             <div className="w-12 h-12 flex items-center justify-center rounded-full bg-white text-blue-600 font-bold text-lg leading-none">
               {contact.displayName.charAt(0).toUpperCase()}
             </div>
@@ -60,7 +73,6 @@ const Sidebar = ({ name, contacts, setContactSelected }: SidebarProps) => {
             {/* Indicador en línea */}
           </div>
         ))}
-
       </div>
     </div>
   );
