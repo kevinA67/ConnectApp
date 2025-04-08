@@ -29,7 +29,6 @@ const MessageInput = ({ contact, user, setMessages, messages }: MessageInputProp
 
   const handleSend = () => {
     if (message.trim() !== "") {
-      console.log("Mensaje enviado:", message, " ", contact?.email);
       socket.emit("message", {
         clave1 : `${contact?.email}-${user}`,
         clave2 : `${user}-${contact?.email}`,
@@ -39,7 +38,6 @@ const MessageInput = ({ contact, user, setMessages, messages }: MessageInputProp
       });
       setMessage("");
       if(messages){
-        console.log("Mensajesssss", messages)
         setMessages((prevMessages) => [
           ...prevMessages,
           {
@@ -50,7 +48,6 @@ const MessageInput = ({ contact, user, setMessages, messages }: MessageInputProp
         ]);
       }
       else {
-        console.log("Mensajesssss else", messages)
         setMessages([
           {
             emisor: user,

@@ -3,6 +3,7 @@
 import { useState } from "react";
 import { Contacts } from "../types";
 import socket from "../utils/socket";
+import { useRouter } from "next/navigation";
 
 type SidebarProps = {
   name: String;
@@ -22,13 +23,22 @@ const Sidebar = ({
     setIsMenuOpen(!isMenuOpen);
   };
 
+  const [active, setActive] = useState(false);
+  const router = useRouter();
+
   const handleContactClick = (contact: Contacts) => {
-    console.log("Contacto seleccionado:", contact);
     setContactSelected(contact);
     socket.emit("obtener_mensajes", {
       clave1: `${contact.email}-${user}`,
-      clave2: `${user}-${contact.email}`
+      clave2: `${user}-${contact.email}`,
     });
+  };
+
+  const handleClose = () => {
+    setActive(true);
+    sessionStorage.removeItem("token");
+    socket.emit("logout");
+    router.push("/login");
   };
 
   return (
@@ -47,7 +57,11 @@ const Sidebar = ({
 
           {isMenuOpen && (
             <div className="absolute top-full right-0 mt-2 w-40 bg-blue-900 shadow-lg rounded-md border">
-              <button className="w-full text-left px-4 py-2 text-white-500 hover:bg-blue-700 rounded-md">
+              <button
+                className="w-full text-left px-4 py-2 text-white-500 hover:bg-blue-700 rounded-md"
+                onClick={handleClose}
+                disabled={active}
+              >
                 Cerrar sesión
               </button>
             </div>

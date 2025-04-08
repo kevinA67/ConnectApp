@@ -55,9 +55,7 @@ const Home = () => {
     });
 
     socket.on("message_response", (data) => {
-      console.log("Mensaje respuesta", data)
       if (data !== null) {
-        console.log("Mensaje respuesta", data)
         setMessages((prevMessages) => [...prevMessages, data]);
       }
     });

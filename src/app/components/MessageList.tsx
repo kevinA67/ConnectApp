@@ -6,11 +6,9 @@ type MessageListProps = {
 };
 
 const MessageList = ({ messages, user }: MessageListProps) => {
-  console.log("Usuario conectado", user)
   return (
     <div className="flex flex-col p-4 space-y-4 h-96 overflow-y-auto">
       {messages &&  messages.map((messages, index) => {
-        console.log("emisor", messages.emisor, "usuario", user)
         if (messages.emisor === user) {
           return (
             <div className="flex justify-end" key={index}>

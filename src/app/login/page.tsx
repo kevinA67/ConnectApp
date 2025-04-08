@@ -1,6 +1,6 @@
 "use client";
 
-import React, { ChangeEvent, use, useEffect, useRef, useState } from "react";
+import React, { ChangeEvent, useEffect, useRef, useState } from "react";
 import Image from "next/image";
 import socket from "../utils/socket";
 import { User } from "../types";
@@ -30,7 +30,6 @@ useEffect(() => {
     if(data.status === "success") {
       router.push(`/?uid=${data.uid}&name=${data.name}`);
       sessionStorage.setItem('token', data.id_token);
-      setActive(false);
     }else if(data.status === "error") {
       setError(data.message);
       setActive(false);
@@ -43,6 +42,7 @@ useEffect(() => {
 }, []);
   const handleSubmit = () => {
     setActive(true);
+    
     const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
 
     if (isRegistering) {
