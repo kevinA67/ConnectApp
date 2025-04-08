@@ -1,3 +1,5 @@
+"use client";
+
 import { Messages } from "../types";
 
 type MessageListProps = {

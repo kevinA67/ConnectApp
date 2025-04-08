@@ -1,13 +1,13 @@
 "use client";
 
-import React, { ChangeEvent, useEffect, useRef, useState } from "react";
+import React, { ChangeEvent, useEffect, useState } from "react";
 import Image from "next/image";
 import socket from "../utils/socket";
 import { User } from "../types";
 import { useRouter } from 'next/navigation'
 
 
-const page = () => {
+const Page = () => {
   const [user, setUser] = useState<User>({email: "", name: "", password: ""});
   const [isRegistering, setIsRegistering] = useState(false);
   const [error, setError] = useState('');
@@ -162,4 +162,4 @@ useEffect(() => {
   );
 };
 
-export default page;
+export default Page;

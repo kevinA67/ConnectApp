@@ -6,7 +6,7 @@ import socket from "../utils/socket";
 import { useRouter } from "next/navigation";
 
 type SidebarProps = {
-  name: String;
+  name: string;
   contacts: Contacts[];
   setContactSelected: (contact: Contacts) => void;
   user: string;

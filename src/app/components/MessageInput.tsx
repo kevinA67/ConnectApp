@@ -1,3 +1,5 @@
+"use client"
+
 import React, {
   useState,
   lazy,
@@ -5,9 +7,9 @@ import React, {
   Dispatch,
   SetStateAction,
 } from "react";
-import { Theme } from "emoji-picker-react";
 import socket from "../utils/socket";
 import { Contacts, Messages } from "../types";
+import { EmojiClickData } from "emoji-picker-react";
 
 const EmojiPicker = lazy(() => import("emoji-picker-react"));
 
@@ -22,7 +24,7 @@ const MessageInput = ({ contact, user, setMessages, messages }: MessageInputProp
   const [message, setMessage] = useState("");
   const [showEmojiPicker, setShowEmojiPicker] = useState(false);
 
-  const handleEmojiClick = (emojiData: any) => {
+  const handleEmojiClick = (emojiData: EmojiClickData) => {
     setMessage((prev) => prev + emojiData.emoji);
     setShowEmojiPicker(false); // cerrar después de elegir
   };

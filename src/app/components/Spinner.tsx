@@ -1,3 +1,5 @@
+"use client";
+
 import React from "react";
 import "../styles/Spinner.css"; // Asegúrate de tener este archivo CSS para los estilos
 
